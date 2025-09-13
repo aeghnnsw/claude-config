@@ -1,0 +1,19 @@
+# Logs and temporary files
+*.log
+*.tmp
+.DS_Store
+
+# Backup files created during sync
+*.bak
+
+# Local configuration overrides (if any)
+local.conf
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS generated files
+Thumbs.db
