@@ -2,6 +2,11 @@
 *.log
 *.tmp
 .DS_Store
+logs/
+
+# Legacy export script and generated output
+claude-setup-export.sh
+claude-setup-export/
 
 # Backup files created during sync
 *.bak
