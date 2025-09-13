@@ -1,3 +1,0 @@
-- when commit or create issue or create PR, don't add "created by claude code" or similar messages
-- When create PR don't create test plan
-- make PR comment simple, concise and accurate

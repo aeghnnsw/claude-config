@@ -62,14 +62,6 @@ else
     echo "⚠️  Warning: hooks templates not found"
 fi
 
-# Deploy CLAUDE.md if it exists
-if [[ -f "$TEMPLATES_DIR/CLAUDE.md" ]]; then
-    echo "📄 Deploying CLAUDE.md..."
-    cp "$TEMPLATES_DIR/CLAUDE.md" "$CLAUDE_DIR/CLAUDE.md"
-else
-    echo "⚠️  CLAUDE.md template not found (this is optional)"
-fi
-
 echo "✅ Deploy complete! Claude configuration updated for this machine"
 echo ""
 echo "📋 What was deployed:"

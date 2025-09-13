@@ -59,14 +59,6 @@ else
     echo "⚠️  Warning: hooks directory not found in ~/.claude"
 fi
 
-# Sync CLAUDE.md if it exists
-if [[ -f "$CLAUDE_DIR/CLAUDE.md" ]]; then
-    echo "📄 Syncing CLAUDE.md..."
-    cp "$CLAUDE_DIR/CLAUDE.md" "$TEMPLATES_DIR/CLAUDE.md"
-else
-    echo "⚠️  CLAUDE.md not found (this is optional)"
-fi
-
 echo "✅ Sync complete! Templates updated with current ~/.claude configuration"
 echo ""
 echo "📋 Next steps:"
