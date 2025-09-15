@@ -11,7 +11,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "uv run {{HOME}}/.claude/hooks/safety_guard.py"
+            "command": "uv run --no-project python {{HOME}}/.claude/hooks/safety_guard.py"
           }
         ]
       },
@@ -20,7 +20,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "uv run {{HOME}}/.claude/hooks/pre_git_hook.py"
+            "command": "uv run --no-project python {{HOME}}/.claude/hooks/pre_git_hook.py"
           }
         ]
       }
@@ -31,7 +31,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "uv run {{HOME}}/.claude/hooks/post_tool_use.py"
+            "command": "uv run --no-project python {{HOME}}/.claude/hooks/post_tool_use.py"
           }
         ]
       }
@@ -42,7 +42,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "uv run {{HOME}}/.claude/hooks/system_notification.py"
+            "command": "uv run --no-project python {{HOME}}/.claude/hooks/system_notification.py"
           }
         ]
       }
@@ -53,7 +53,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "uv run {{HOME}}/.claude/hooks/system_notification.py"
+            "command": "uv run --no-project python {{HOME}}/.claude/hooks/system_notification.py"
           }
         ]
       }
@@ -64,7 +64,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "uv run {{HOME}}/.claude/hooks/system_notification.py"
+            "command": "uv run --no-project python {{HOME}}/.claude/hooks/system_notification.py"
           }
         ]
       }
