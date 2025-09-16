@@ -11,7 +11,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "uv run --no-project python {{HOME}}/.claude/hooks/safety_guard.py"
+            "command": "uv run --no-project {{HOME}}/.claude/hooks/safety_guard.py"
           }
         ]
       },
@@ -20,7 +20,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "uv run --no-project python {{HOME}}/.claude/hooks/pre_git_hook.py"
+            "command": "uv run --no-project {{HOME}}/.claude/hooks/pre_git_hook.py"
           }
         ]
       }
@@ -31,40 +31,51 @@
         "hooks": [
           {
             "type": "command",
-            "command": "uv run --no-project python {{HOME}}/.claude/hooks/post_tool_use.py"
+            "command": "uv run --no-project {{HOME}}/.claude/hooks/post_tool_use.py"
           }
         ]
       }
     ],
     "Notification": [
       {
-        "matcher": ".*",
+        "matcher": "",
         "hooks": [
           {
             "type": "command",
-            "command": "uv run --no-project python {{HOME}}/.claude/hooks/system_notification.py"
+            "command": "uv run --no-project {{HOME}}/.claude/hooks/system_notification.py"
           }
         ]
       }
     ],
     "Stop": [
       {
-        "matcher": ".*",
+        "matcher": "",
         "hooks": [
           {
             "type": "command",
-            "command": "uv run --no-project python {{HOME}}/.claude/hooks/system_notification.py"
+            "command": "uv run --no-project {{HOME}}/.claude/hooks/system_notification.py --success"
           }
         ]
       }
     ],
     "SubagentStop": [
       {
-        "matcher": ".*",
+        "matcher": "",
         "hooks": [
           {
             "type": "command",
-            "command": "uv run --no-project python {{HOME}}/.claude/hooks/system_notification.py"
+            "command": "uv run --no-project {{HOME}}/.claude/hooks/system_notification.py --success"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "uv run --no-project {{HOME}}/.claude/hooks/system_notification.py --success"
           }
         ]
       }
@@ -72,6 +83,6 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "bash ~/.claude/statusline-with-tokens.sh"
+    "command": "bash {{HOME}}/.claude/statusline-with-tokens.sh"
   }
 }

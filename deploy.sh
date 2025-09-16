@@ -62,6 +62,7 @@ else
     echo "⚠️  Warning: hooks templates not found"
 fi
 
+
 echo "✅ Deploy complete! Claude configuration updated for this machine"
 echo ""
 echo "📋 What was deployed:"

@@ -1,6 +1,9 @@
 #!/usr/bin/env -S uv run --script
 # /// script
 # requires-python = ">=3.8"
+# dependencies = [
+#   "chime",
+# ]
 # ///
 
 import json
@@ -9,61 +12,37 @@ import subprocess
 import platform
 from pathlib import Path
 
-def play_system_sound(sound_type="default"):
+def play_notification_sound(sound_type="default"):
     """
-    Play system notification sound based on the operating system.
-    
+    Play notification sound using chime package with material theme.
+
     Args:
-        sound_type: Type of sound to play ("success", "attention", "default")
+        sound_type: Type of sound to play (success, error, info, attention, default)
     """
     try:
-        system = platform.system().lower()
-        
-        if system == "darwin":  # macOS
-            # macOS system sounds
-            sound_map = {
-                "success": "Glass",
-                "attention": "Sosumi", 
-                "default": "Ping",
-                "error": "Basso"
-            }
-            sound_name = sound_map.get(sound_type, "Ping")
-            subprocess.run(["afplay", f"/System/Library/Sounds/{sound_name}.aiff"], 
-                         capture_output=True, timeout=5)
-            
-        elif system == "linux":
-            # Linux - try different approaches
-            sound_map = {
-                "success": "complete",
-                "attention": "bell", 
-                "default": "bell",
-                "error": "error"
-            }
-            sound_name = sound_map.get(sound_type, "bell")
-            
-            # Try paplay first (PulseAudio)
-            try:
-                subprocess.run(["paplay", f"/usr/share/sounds/sound-icons/{sound_name}.wav"], 
-                             capture_output=True, timeout=5, check=True)
-            except (subprocess.CalledProcessError, FileNotFoundError):
-                # Fallback to system beep
-                subprocess.run(["printf", "\a"], capture_output=True, timeout=2)
-                
-        elif system == "windows":
-            # Windows system sounds
-            import winsound
-            sound_map = {
-                "success": winsound.MB_OK,
-                "attention": winsound.MB_ICONEXCLAMATION,
-                "default": winsound.MB_ICONASTERISK,
-                "error": winsound.MB_ICONHAND
-            }
-            sound_type_code = sound_map.get(sound_type, winsound.MB_ICONASTERISK)
-            winsound.MessageBeep(sound_type_code)
+        import chime
+
+        # Set theme to material
+        chime.theme('material')
+
+        # Play different sounds based on type - use sync=True to avoid hanging
+        if sound_type == "success":
+            chime.success(sync=True)
+        elif sound_type == "error":
+            chime.error(sync=True)
+        elif sound_type == "info":
+            chime.info(sync=True)
+        elif sound_type == "attention":
+            chime.warning(sync=True)
         else:
-            # Fallback - terminal bell
+            chime.warning(sync=True)  # default
+
+    except ImportError:
+        # Fallback to terminal bell if chime not available
+        try:
             print("\a", end="", flush=True)
-            
+        except:
+            pass  # Silent failure
     except Exception:
         # Ultimate fallback - terminal bell
         try:
@@ -74,51 +53,23 @@ def play_system_sound(sound_type="default"):
 
 def main():
     try:
-        # Read JSON input from stdin
-        input_data = json.load(sys.stdin)
-        
-        # Ensure log directory exists
-        log_dir = Path.cwd() / 'logs'
-        log_dir.mkdir(parents=True, exist_ok=True)
-        log_path = log_dir / 'system_notification.json'
-        
-        # Read existing log data or initialize empty list
-        if log_path.exists():
-            with open(log_path, 'r') as f:
-                try:
-                    log_data = json.load(f)
-                except (json.JSONDecodeError, ValueError):
-                    log_data = []
-        else:
-            log_data = []
-        
-        # Append new data
-        log_data.append(input_data)
-        
-        # Write back to file with formatting
-        with open(log_path, 'w') as f:
-            json.dump(log_data, f, indent=2)
-        
-        # Determine sound type based on hook event and context
-        hook_event = input_data.get('hook_event_name', '')
-        tool_name = input_data.get('tool_name', '')
-        
-        # Play different sounds for different events
-        if hook_event == 'UserPromptSubmit':
-            # Claude is waiting for user input
-            play_system_sound("attention")
-        elif hook_event == 'PostToolUse':
-            # Tool execution completed
-            if tool_name in ['Bash', 'Write', 'Edit', 'MultiEdit']:
-                play_system_sound("success")
-            else:
-                play_system_sound("default")
-        elif hook_event == 'Stop':
-            # Session/task completion
-            play_system_sound("success")
-        else:
-            # Default notification
-            play_system_sound("default")
+        # Check for command line arguments first
+        if len(sys.argv) > 1:
+            sound_type = None
+            if '--success' in sys.argv:
+                sound_type = 'success'
+            elif '--error' in sys.argv:
+                sound_type = 'error'
+            elif '--info' in sys.argv:
+                sound_type = 'info'
+            elif '--attention' in sys.argv:
+                sound_type = 'attention'
+
+            # Play the specified sound
+            if sound_type:
+                play_notification_sound(sound_type)
+
+        # No stdin processing needed for command line usage
         
         sys.exit(0)
         

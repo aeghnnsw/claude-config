@@ -55,6 +55,7 @@ if [[ -d "$CLAUDE_DIR/hooks" ]]; then
             convert_to_template "$hook_file" "$TEMPLATES_DIR/hooks/$filename"
         fi
     done
+
 else
     echo "⚠️  Warning: hooks directory not found in ~/.claude"
 fi
