@@ -24,19 +24,20 @@ def main():
     # Check if this is a git operation
     if tool_name == "Bash":
         command = tool_input.get("command", "")
-        if "git add ." in command:
-            # Allow git add for specific dotfiles, but block git add .
-            import re
+        import re
+        # Block git add . and git add -A operations
+        if re.search(r'git add\s+(-A|--all|\.|\.\/)', command):
+            # Allow git add for specific dotfiles, but block git add . and git add -A
             # Check if it's adding a specific dotfile (like .gitignore, .env.example, etc.)
-            dotfile_pattern = r'git add \.[a-zA-Z][a-zA-Z0-9._-]*'
-            if not re.search(dotfile_pattern, command) or command.strip() == "git add .":
-                # Block git add . operations
+            dotfile_pattern = r'git add \.[a-zA-Z][a-zA-Z0-9._-]*(?:\s|$)'
+            if not re.search(dotfile_pattern, command) or re.search(r'git add\s+(-A|--all|\s+\.\s*$)', command):
+                # Block bulk git add operations
                 response = {
-                    "systemMessage": "❌ BLOCKED: Use 'git add <filename>' with specific file names instead of 'git add .' for precise change control.",
+                    "systemMessage": "❌ BLOCKED: Use 'git add <filename>' with specific file names instead of 'git add .', 'git add -A', or 'git add --all' for precise change control.",
                     "hookSpecificOutput": {
                         "hookEventName": "PreToolUse",
                         "permissionDecision": "deny",
-                        "permissionDecisionReason": "git add . is prohibited - use specific file names"
+                        "permissionDecisionReason": "Bulk git add operations are prohibited - use specific file names"
                     }
                 }
                 print(json.dumps(response))
