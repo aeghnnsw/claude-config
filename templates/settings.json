@@ -1,9 +1,5 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
-  "feedbackSurveyState": {
-    "lastShownTime": 1754070493585
-  },
-  "model": "sonnet",
   "hooks": {
     "PreToolUse": [
       {
@@ -84,5 +80,14 @@
   "statusLine": {
     "type": "command",
     "command": "bash {{HOME}}/.claude/statusline-with-tokens.sh"
+  },
+  "enabledPlugins": {
+    "pymol-plugin@cc-marketplace": true,
+    "document-skills@anthropic-agent-skills": true,
+    "example-skills@anthropic-agent-skills": true
+  },
+  "alwaysThinkingEnabled": true,
+  "feedbackSurveyState": {
+    "lastShownTime": 1754070493585
   }
 }

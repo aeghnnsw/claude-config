@@ -42,20 +42,32 @@ def main():
                 }
                 print(json.dumps(response))
                 sys.exit(0)
-        elif "git checkout -b" in command or "git switch -c" in command:
+        elif "git checkout -b" in command or "git switch -c" in command or "git worktree add" in command:
             # Extract branch name and validate naming convention
             import re
-            
+
             # Extract branch name from command
+            branch_name = None
             if "git checkout -b" in command:
                 match = re.search(r'git checkout -b\s+(\S+)', command)
-            else:  # git switch -c
+                if match:
+                    branch_name = match.group(1)
+            elif "git switch -c" in command:
                 match = re.search(r'git switch -c\s+(\S+)', command)
-            
-            if match:
-                branch_name = match.group(1)
+                if match:
+                    branch_name = match.group(1)
+            elif "git worktree add" in command:
+                # Match git worktree add with -b or --branch flag
+                match = re.search(r'git worktree add\s+\S+\s+(?:-b|--branch)\s+(\S+)', command)
+                if match:
+                    branch_name = match.group(1)
+                else:
+                    # No new branch being created, allow operation
+                    sys.exit(0)
+
+            if branch_name:
                 valid_prefixes = ['feat-', 'bugfix-', 'doc-', 'refactor-', 'chore-', 'test-']
-                
+
                 if not any(branch_name.startswith(prefix) for prefix in valid_prefixes):
                     # Block invalid branch name
                     response = {
@@ -68,7 +80,7 @@ def main():
                     }
                     print(json.dumps(response))
                     sys.exit(0)
-            
+
             # Valid branch name, just show reminder
             response = {
                 "systemMessage": "Branch Naming Convention: Using approved prefix - good practice!"
