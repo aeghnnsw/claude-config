@@ -47,7 +47,7 @@ if [[ -f "$CLAUDE_DIR/settings.json" ]]; then
         fi
     else
         # No existing template, create minimal one with statusLine only
-        jq '{"\$schema": ."$schema", statusLine: .statusLine}' "$CLAUDE_DIR/settings.json" \
+        jq '{"$schema": ."$schema", statusLine: .statusLine}' "$CLAUDE_DIR/settings.json" \
             | sed "s|$HOME|{{HOME}}|g" > "$TEMPLATES_DIR/settings.json"
     fi
 else

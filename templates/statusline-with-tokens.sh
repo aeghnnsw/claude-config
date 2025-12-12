@@ -30,7 +30,7 @@ fi
 
 # Format context usage if available
 context_info=""
-if [ "$input_tokens" != "0" ] && [ "$input_tokens" != "null" ]; then
+if [ "$input_tokens" != "0" ] && [ "$input_tokens" != "null" ] && [ "$context_window_size" != "0" ] && [ "$context_window_size" != "null" ]; then
     # Calculate context usage percentage
     context_pct=$(echo "scale=1; $input_tokens * 100 / $context_window_size" | bc -l)
     # Format tokens in K
