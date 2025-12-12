@@ -11,7 +11,11 @@ current_dir=$(echo "$input" | jq -r '.workspace.current_dir')
 model=$(echo "$input" | jq -r '.model.display_name')
 total_cost=$(echo "$input" | jq -r '.cost.total_cost_usd // 0')
 total_duration=$(echo "$input" | jq -r '.cost.total_duration_ms // 0')
-context_usage=$(echo "$input" | jq -r '.context_usage_pct // 0')
+
+# Extract context window info
+input_tokens=$(echo "$input" | jq -r '.context_window.total_input_tokens // 0')
+output_tokens=$(echo "$input" | jq -r '.context_window.total_output_tokens // 0')
+context_window_size=$(echo "$input" | jq -r '.context_window.context_window_size // 200000')
 
 # Get git info
 git_info=$(cd "$current_dir" 2>/dev/null && git branch --show-current 2>/dev/null | sed 's/^/ (/' | sed 's/$/)/' || echo '')
@@ -26,9 +30,13 @@ fi
 
 # Format context usage if available
 context_info=""
-if [ "$context_usage" != "0" ] && [ "$context_usage" != "null" ]; then
-    context_display=$(printf "%.0f%%" "$context_usage")
-    context_info=$(printf " \033[34m%s ctx\033[0m" "$context_display")
+if [ "$input_tokens" != "0" ] && [ "$input_tokens" != "null" ]; then
+    # Calculate context usage percentage
+    context_pct=$(echo "scale=1; $input_tokens * 100 / $context_window_size" | bc -l)
+    # Format tokens in K
+    input_k=$(echo "scale=1; $input_tokens / 1000" | bc -l | sed 's/^\./0./')
+    output_k=$(echo "scale=1; $output_tokens / 1000" | bc -l | sed 's/^\./0./')
+    context_info=$(printf " \033[34m%.1fK/%.1fK (%.0f%%)\033[0m" "$input_k" "$output_k" "$context_pct")
 fi
 
 # Format duration if significant (over 1 second)

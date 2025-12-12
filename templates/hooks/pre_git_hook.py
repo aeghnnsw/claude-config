@@ -26,11 +26,14 @@ def main():
         command = tool_input.get("command", "")
         import re
         # Block git add . and git add -A operations
-        if re.search(r'git add\s+(-A|--all|\.|\.\/)', command):
+        # Use negative lookahead (?!\S) to match . not followed by non-whitespace
+        # This blocks: git add ., git add . && git commit, git add ./
+        # But allows: git add .gitignore, git add .env
+        if re.search(r'git add\s+(-A|--all|\.(?!\S)|\.\/)', command):
             # Allow git add for specific dotfiles, but block git add . and git add -A
             # Check if it's adding a specific dotfile (like .gitignore, .env.example, etc.)
             dotfile_pattern = r'git add \.[a-zA-Z][a-zA-Z0-9._-]*(?:\s|$)'
-            if not re.search(dotfile_pattern, command) or re.search(r'git add\s+(-A|--all|\s+\.\s*$)', command):
+            if not re.search(dotfile_pattern, command) or re.search(r'git add\s+(-A|--all|\.(?!\S))', command):
                 # Block bulk git add operations
                 response = {
                     "systemMessage": "❌ BLOCKED: Use 'git add <filename>' with specific file names instead of 'git add .', 'git add -A', or 'git add --all' for precise change control.",

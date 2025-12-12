@@ -29,10 +29,27 @@ convert_to_template() {
     sed "s|$HOME|{{HOME}}|g" "$file" > "$output"
 }
 
-# Sync settings.json if it exists
+# Sync settings.json - merge statusLine from ~/.claude into existing template
+# This preserves hooks and other template-managed config while updating statusLine
 if [[ -f "$CLAUDE_DIR/settings.json" ]]; then
-    echo "📄 Syncing settings.json..."
-    convert_to_template "$CLAUDE_DIR/settings.json" "$TEMPLATES_DIR/settings.json"
+    echo "📄 Syncing settings.json (merging statusLine only)..."
+    if [[ -f "$TEMPLATES_DIR/settings.json" ]]; then
+        # Extract statusLine from ~/.claude and merge into template
+        # Keeps: hooks, $schema from template; Updates: statusLine from ~/.claude
+        # Excludes: enabledPlugins, feedbackSurveyState, alwaysThinkingEnabled
+        statusline=$(jq '.statusLine // null' "$CLAUDE_DIR/settings.json")
+        if [[ "$statusline" != "null" ]]; then
+            jq --argjson sl "$statusline" '.statusLine = $sl' "$TEMPLATES_DIR/settings.json" \
+                | sed "s|$HOME|{{HOME}}|g" > "$TEMPLATES_DIR/settings.json.tmp"
+            mv "$TEMPLATES_DIR/settings.json.tmp" "$TEMPLATES_DIR/settings.json"
+        else
+            echo "    (no statusLine in ~/.claude, keeping template value)"
+        fi
+    else
+        # No existing template, create minimal one with statusLine only
+        jq '{"\$schema": ."$schema", statusLine: .statusLine}' "$CLAUDE_DIR/settings.json" \
+            | sed "s|$HOME|{{HOME}}|g" > "$TEMPLATES_DIR/settings.json"
+    fi
 else
     echo "⚠️  Warning: settings.json not found in ~/.claude"
 fi
