@@ -8,7 +8,7 @@ This repository manages Claude Code configuration templates that can be deployed
 claude_setup/
 ├── templates/                 # Template configuration files
 │   ├── settings.json         # Main Claude settings (with {{HOME}} placeholders)
-│   ├── statusline-with-tokens.sh  # Custom statusline script
+│   ├── statusline-with-tokens.sh  # Custom statusline (shows tokens, cost, context %)
 │   ├── CLAUDE.md            # Global Claude instructions
 │   └── hooks/               # Python hook scripts
 │       ├── safety_guard.py
@@ -31,9 +31,10 @@ When you make changes to your Claude configuration on any machine:
 ```
 
 This will:
-- Extract current configuration from `~/.claude`
+- Merge `statusLine` from `~/.claude/settings.json` into template (preserves hooks)
+- Sync statusline script and hook files
 - Convert absolute paths to `{{HOME}}` placeholders
-- Update template files
+- Exclude machine-specific settings (`enabledPlugins`, `feedbackSurveyState`)
 - Preserve untracked files (chat history, cache, etc.)
 
 ### 2. Deploy Configuration (Templates → Machine)
@@ -116,7 +117,18 @@ After modifying Claude settings on any machine:
 ✅ **Path independence** - Works across different user accounts
 ✅ **Data preservation** - Never touches chat history or cache
 ✅ **Version controlled** - Full git history of configuration changes
-✅ **Machine identification** - Easy to track which machine made changes
+✅ **Selective sync** - Only syncs shared config, excludes machine-specific settings
+
+## Settings Management
+
+**Synced settings** (shared across machines):
+- `hooks` - PreToolUse, PostToolUse, Notification hooks
+- `statusLine` - Custom statusline configuration
+
+**Excluded settings** (machine-specific):
+- `enabledPlugins` - Plugin preferences
+- `feedbackSurveyState` - Local UI state
+- `alwaysThinkingEnabled` - Personal preference
 
 ## Template System
 
