@@ -13,9 +13,8 @@ total_cost=$(echo "$input" | jq -r '.cost.total_cost_usd // 0')
 total_duration=$(echo "$input" | jq -r '.cost.total_duration_ms // 0')
 
 # Extract context window info
-input_tokens=$(echo "$input" | jq -r '.context_window.total_input_tokens // 0')
-output_tokens=$(echo "$input" | jq -r '.context_window.total_output_tokens // 0')
 context_window_size=$(echo "$input" | jq -r '.context_window.context_window_size // 200000')
+current_usage=$(echo "$input" | jq '.context_window.current_usage')
 
 # Get git info
 git_info=$(cd "$current_dir" 2>/dev/null && git branch --show-current 2>/dev/null | sed 's/^/ (/' | sed 's/$/)/' || echo '')
@@ -28,15 +27,13 @@ if [ "$total_cost" != "null" ]; then
 fi
 # Note: For Claude Max subscribers, cost is typically 0/null, so no cost info is displayed
 
-# Format context usage if available
+# Format context window usage percentage (using current_usage from 2.0.70+)
 context_info=""
-if [ "$input_tokens" != "0" ] && [ "$input_tokens" != "null" ] && [ "$context_window_size" != "0" ] && [ "$context_window_size" != "null" ]; then
-    # Calculate context usage percentage
-    context_pct=$(echo "scale=1; $input_tokens * 100 / $context_window_size" | bc -l)
-    # Format tokens in K
-    input_k=$(echo "scale=1; $input_tokens / 1000" | bc -l | sed 's/^\./0./')
-    output_k=$(echo "scale=1; $output_tokens / 1000" | bc -l | sed 's/^\./0./')
-    context_info=$(printf " \033[34m%.1fK/%.1fK (%.0f%%)\033[0m" "$input_k" "$output_k" "$context_pct")
+if [ "$current_usage" != "null" ]; then
+    # Calculate actual context window occupancy from current_usage fields
+    current_tokens=$(echo "$current_usage" | jq '.input_tokens + .cache_creation_input_tokens + .cache_read_input_tokens')
+    percent_used=$((current_tokens * 100 / context_window_size))
+    context_info=$(printf " \033[34m%d%%\033[0m" "$percent_used")
 fi
 
 # Format duration if significant (over 1 second)
